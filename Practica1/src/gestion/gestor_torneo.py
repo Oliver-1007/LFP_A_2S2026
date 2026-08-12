@@ -9,20 +9,19 @@ class GestorTorneo:
     def __init__(self):
         self.sudokus = {}
         self.jugadores = {}
-        self.intentos = {}
+        self.intentos = []
 
         self.sudokus_cargados = False
         self.jugadores_cargados = False
         self.intentos_cargados = False
-        self.intentos_validos = False
+        self.intentos_validados = False
 
     # -----------------------------------------------------------------
     # CARGA DE ARCHIVOS
     # Espera 3 datos, analiza que sean validos y los guarda en el diccionario self.sudoku
-    def cargar_sudoku(self,ruta_archivo: str) -> tuple:
+    def cargar_sudokus(self, ruta_archivo: str) -> tuple:
         cargados = 0
         errores = []
-
         try:
             with open(ruta_archivo, "r", encoding="utf-8") as archivo:
                 lineas = archivo.readlines()
@@ -34,12 +33,12 @@ class GestorTorneo:
         for numero_linea, linea in enumerate(lineas, start=1):
             linea = linea.strip()
             if not linea:
-                continue 
+                continue
             partes = linea.split(",")
             if len(partes) != 3:
                 errores.append(
-                    f"Línea {numero_linea} de sudokus: formato inválido, se"
-                    "esperan 3 campos."
+                    f"Línea {numero_linea} de sudokus: formato inválido, se "
+                    "esperaban 3 campos."
                 )
                 continue
             id_sudoku, dificultad, tablero_str = partes
@@ -48,24 +47,23 @@ class GestorTorneo:
                 self.sudokus[tablero.id_sudoku] = tablero
                 cargados += 1
             except ValueError as error:
-                errores.append(f"Linea {numero_linea} de sudokus: {error}")
+                errores.append(f"Línea {numero_linea} de sudokus: {error}")
 
         self.sudokus_cargados = cargados > 0
         return cargados, errores
     
     # Espera 4 datos, analiza que sean correctos y luego los guarda en un diccionario
     # self.jugadores
-    def cargar_jugadores(self, ruta_archivos: str) -> tuple:
+    def cargar_jugadores(self, ruta_archivo: str) -> tuple:
         cargados = 0
         errores = []
-
         try:
-            with open(ruta_archivos, "r", encoding="utf-8") as archivo:
+            with open(ruta_archivo, "r", encoding="utf-8") as archivo:
                 lineas = archivo.readlines()
         except FileNotFoundError:
-            return 0, [f"No se encontro el archivo {ruta_archivos}"]
+            return 0, [f"No se encontró el archivo: {ruta_archivo}"]
         except OSError as error:
-            return 0, [f"No se puede leer el archivo: {error}"]
+            return 0, [f"No se pudo leer el archivo: {error}"]
 
         for numero_linea, linea in enumerate(lineas, start=1):
             linea = linea.strip()
@@ -74,8 +72,8 @@ class GestorTorneo:
             partes = linea.split(",")
             if len(partes) != 4:
                 errores.append(
-                    f"Linea {numero_linea} de jugadores: formato inválido, "
-                    "se esperan 4 campos."
+                    f"Línea {numero_linea} de jugadores: formato inválido, "
+                    "se esperaban 4 campos."
                 )
                 continue
             carnet, nombre, apellido, nivel = partes
@@ -84,7 +82,7 @@ class GestorTorneo:
                 self.jugadores[jugador.carnet] = jugador
                 cargados += 1
             except ValueError as error:
-                errores.append(f"Línea {numero_linea} de jugadores {errores}")
+                errores.append(f"Línea {numero_linea} de jugadores: {error}")
 
         self.jugadores_cargados = cargados > 0
         return cargados, errores
@@ -132,29 +130,29 @@ class GestorTorneo:
 
         validados = 0
         errores = []
-
         for intento in self.intentos:
             tablero = self.sudokus.get(intento.id_sudoku)
             if tablero is None:
                 errores.append(
                     f"El intento del carnet {intento.carnet} referencia el "
-                    f"sudoku {intento.id_sudoku}, que no existe"
+                    f"sudoku {intento.id_sudoku}, que no existe."
                 )
                 continue
             Validador_sudoku.validar_intento(tablero, intento)
             validados += 1
 
-        self.intentos_validos = validados > 0
-        return validados. errores
+        self.intentos_validados = validados > 0
+        return validados, errores
 
 
-    def _intentos_de(self, id_sudoku: int = None, carnet : int = None) -> list:
+    def _intentos_de(self, id_sudoku: int = None, carnet: int = None) -> list:
+        """Filtra la lista de intentos validados por sudoku y/o jugador."""
         resultado = [i for i in self.intentos if i.validado]
         if id_sudoku is not None:
             resultado = [i for i in resultado if i.id_sudoku == id_sudoku]
         if carnet is not None:
             resultado = [i for i in resultado if i.carnet == carnet]
-            return resultado
+        return resultado
 
     # ------------------------------------------------------------------
     # Genera un resumen de desmpeño para cada tablero del torneo

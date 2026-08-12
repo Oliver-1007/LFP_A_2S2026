@@ -1,15 +1,15 @@
 
 
 class Intento:
-    TANAÑO = 9
+    TAMAÑO = 9
 
-    def __init__(self, carnet: int,id_sudoku: int,solucion: str,tiempo_segundos: int,fecha: str,):
+    def __init__(self, carnet: int,id_sudoku: int,solucion: str,tiempo_segundos: int,fecha: str):
         self.carnet = int(carnet)
         self.id_sudoku = int(id_sudoku)
         self.solucion = solucion.strip()
         self.tiempo_segundos = int(tiempo_segundos)
         self.fecha = fecha.strip()
-        self.matriz_solucion = self._sconstruir_matriz(self.solucion)
+        self.matriz_solucion = self._construir_matriz(self.solucion)
 
         self.filas_validas = 0
         self.columnas_validas = 0
@@ -17,20 +17,20 @@ class Intento:
         self.porcentaje_validez = 0.0
         self.pistas_respetadas = True
         self.resuelto_correctamente = False
-        self.valido = False
+        self.validado = False
 
     def _construir_matriz(self, cadena: str) -> list:
         if len(cadena) != self.TAMAÑO * self.TAMAÑO:
             raise ValueError(
-                f"El intento de carnet {getattr(self, 'carnet', '?')} para "
-                f"el sudoku {getattr(self, '?')} no tiene 81 "
-                f"caracteres (tiene{len(cadena)})."
+                f"El intento del carnet {getattr(self, 'carnet', '?')} para "
+                f"el sudoku {getattr(self, 'id_sudoku', '?')} no tiene 81 "
+                f"caracteres (tiene {len(cadena)})."
             )
         matriz = []
         for fila in range(self.TAMAÑO):
             inicio = fila * self.TAMAÑO
             fin = inicio + self.TAMAÑO
-            trozo = cadena[inicio: fin]
+            trozo = cadena[inicio:fin]
             if not trozo.isdigit():
                 raise ValueError(
                     f"El intento del carnet {getattr(self, 'carnet', '?')} "

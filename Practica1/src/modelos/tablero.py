@@ -8,7 +8,7 @@ class Tablero:
     def __init__(self, id_sudoku: int, dificultad: str, cadena_tablero: str):
         self.id_sudoku = int(id_sudoku)
         self.dificultad = dificultad.strip()
-        self.cadena_tablero = cadena_tablero.strip()
+        self.cadena_original = cadena_tablero.strip()
         self.matriz = self._construir_matriz(self.cadena_original)
 
     def _construir_matriz(self, cadena: str) -> list:
