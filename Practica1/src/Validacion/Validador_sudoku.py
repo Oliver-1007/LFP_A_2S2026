@@ -13,7 +13,7 @@ class Validador_sudoku:
         Funcion que verifica que cada fila, columna o caja contenga unicamente
         los numeros del 1 al 9 sin repetirse, returna true o false.
         """
-        return sorted(valores) == list(range(1,10))
+        return sorted(valores) == list(range(1, 10))
 
     @classmethod
     def _obtener_filas(cls, matriz: list) -> list:
@@ -21,8 +21,7 @@ class Validador_sudoku:
 
     @classmethod
     def _obtener_columnas(cls, matriz: list) -> list:
-        return [[matriz[f][c] for f in range(cls.TAMAÑO)]
-                                for c in range(cls.TAMAÑO)]
+        return [[matriz[f][c] for f in range(cls.TAMAÑO)] for c in range(cls.TAMAÑO)]
 
     @classmethod
     def _obtener_cajas(cls, matriz: list) -> list:
@@ -33,11 +32,11 @@ class Validador_sudoku:
         """
         cajas = []
         for bloque_fila in range(0, cls.TAMAÑO, cls.TAMAÑO_CAJA):
-            for bloque_columna in range(0, cls.TAMAÑO, cls.TAMAÑO_CAJA):
+            for bloque_col in range(0, cls.TAMAÑO, cls.TAMAÑO_CAJA):
                 caja = [
                     matriz[f][c]
-                    for f in range(bloque_fila, bloque_fila+ cls.TAMAÑO_CAJA)
-                    for c in range(bloque_columna, bloque_columna + cls.TAMAÑO_CAJA)
+                    for f in range(bloque_fila, bloque_fila + cls.TAMAÑO_CAJA)
+                    for c in range(bloque_col, bloque_col + cls.TAMAÑO_CAJA)
                 ]
                 cajas.append(caja)
         return cajas
@@ -49,17 +48,17 @@ class Validador_sudoku:
         INICIAL RETORNANDO TRUE O FALSE
         """
         for fila in range(cls.TAMAÑO):
-            for columna in range (cls.TAMAÑO):
-                if tablero.es_celda_fija(fila,columna):
-                    valor_original = tablero.obtener_valor(fila,columna)
-                    valor_porpuesto = intento.matriz_solucion[fila][columna]
-                    if valor_original != valor_porpuesto:
+            for columna in range(cls.TAMAÑO):
+                if tablero.es_celda_fija(fila, columna):
+                    valor_original = tablero.obtener_valor(fila, columna)
+                    valor_propuesto = intento.matriz_solucion[fila][columna]
+                    if valor_original != valor_propuesto:
                         return False
         return True
 
     @classmethod
     def validar_intento(cls, tablero: Tablero, intento: Intento) -> None:
-        matriz_solucion = intento.matriz_solucion #VERIFICA QUE SEAN 81 CARACTERES CORRECTOS
+        matriz_solucion = intento.matriz_solucion
 
         filas = cls._obtener_filas(matriz_solucion)
         columnas = cls._obtener_columnas(matriz_solucion)
@@ -78,6 +77,6 @@ class Validador_sudoku:
         intento.columnas_validas = columnas_validas
         intento.cajas_validas = cajas_validas
         intento.porcentaje_validez = porcentaje
-        intento.pistas_respetadas = pistas_ok  # True o False
-        intento.resuelto_correctamente = (porcentaje == 100) and pistas_ok
-        intento.valido = True
+        intento.pistas_respetadas = pistas_ok
+        intento.resuelto_correctamente = (porcentaje == 100.0) and pistas_ok
+        intento.validado = True

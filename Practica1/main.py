@@ -28,22 +28,24 @@ def mostrar_menu():
     """)
 
 def pedir_ruta(mensaje: str, ruta_por_defecto: str) -> str:
-    entrada = input(f"{mensaje} [Enter para usar '{ruta_por_defecto}']:").strip()
+    entrada = input(f"{mensaje} [Enter para usar '{ruta_por_defecto}']: ").strip()
     return entrada if entrada else ruta_por_defecto
+
 
 def mostrar_resultado_carga(entidad: str, cantidad: int, errores: list):
     print(f"\n{cantidad} registro(s) de {entidad} cargado(s) correctamente.")
     if errores:
         print(f"Se encontraron {len(errores)} error(es):")
         for error in errores[:10]:
-            print(f"  -{error}")
+            print(f"  - {error}")
         if len(errores) > 10:
-            print(f"   ...y {len(errores) -10} error(es) más.")
+            print(f"  ... y {len(errores) - 10} error(es) más.")
 
 def opcion_cargar_sudokus(gestor: GestorTorneo):
     ruta = pedir_ruta("Ruta del archivo de sudokus", os.path.join("data", "sudokus.lfp"))
     cantidad, errores = gestor.cargar_sudokus(ruta)
     mostrar_resultado_carga("sudokus", cantidad, errores)
+
 
 def opcion_cargar_jugadores(gestor: GestorTorneo):
     ruta = pedir_ruta("Ruta del archivo de jugadores", os.path.join("data", "jugadores.lfp"))
@@ -55,7 +57,6 @@ def opcion_cargar_intentos(gestor: GestorTorneo):
     ruta = pedir_ruta("Ruta del archivo de intentos", os.path.join("data", "intentos.lfp"))
     cantidad, errores = gestor.cargar_intentos(ruta)
     mostrar_resultado_carga("intentos", cantidad, errores)
-
 
 def opcion_validar_intentos(gestor: GestorTorneo):
     if not gestor.sudokus_cargados or not gestor.intentos_cargados:
@@ -98,7 +99,7 @@ def opcion_reporte_top_tiempos(gestor: GestorTorneo, generador: GeneradorReporte
 
 def main():
     gestor = GestorTorneo()
-    # generador = GeneradorReportes(carpeta_salida=RUTA_REPORTES)
+    generador = GeneradorReportes(carpeta_salida=RUTA_REPORTES)
 
     acciones = {
         "1": lambda: opcion_cargar_sudokus(gestor),
