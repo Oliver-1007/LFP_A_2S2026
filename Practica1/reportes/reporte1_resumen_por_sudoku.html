@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte 1: Resumen por Sudoku - Torneo Numerix</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background-color: #f4f6f8; color: #1f2937; }
+        h1 { color: #1e3a8a; }
+        p.subtitulo { color: #6b7280; margin-top: -8px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #1e3a8a; color: #ffffff; }
+        tr:nth-child(even) { background-color: #f9fafb; }
+        tr:hover { background-color: #eef2ff; }
+        .exito-alto { color: #15803d; font-weight: bold; }
+        .exito-medio { color: #b45309; font-weight: bold; }
+        .exito-bajo { color: #b91c1c; font-weight: bold; }
+        footer { margin-top: 24px; color: #9ca3af; font-size: 0.85em; }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; color: white; }
+        .Facil { background-color: #22c55e; }
+        .Media { background-color: #eab308; }
+        .Dificil { background-color: #f97316; }
+        .Experto { background-color: #dc2626; }
+        .oro { background-color: #fde68a; }
+        .plata { background-color: #e5e7eb; }
+        .bronce { background-color: #fdba74; }
+    </style>
+</head>
+<body>
+    <h1>Reporte 1: Resumen por Sudoku</h1>
+    <p class="subtitulo">Torneo de Sudoku - Numerix Academy | Generado el 21-08-2026 14:50:19</p>
+
+    <table>
+        <tr>
+            <th>ID Sudoku</th>
+            <th>Dificultad</th>
+            <th>Cantidad de Intentos</th>
+            <th>Tiempo Promedio (s)</th>
+            <th>Tasa de Fallo</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td><span class="badge Facil">Facil</span></td>
+            <td>5</td>
+            <td>187.00</td>
+            <td class="exito-medio">40.00%</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td><span class="badge Media">Media</span></td>
+            <td>5</td>
+            <td>271.00</td>
+            <td class="exito-medio">40.00%</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td><span class="badge Dificil">Dificil</span></td>
+            <td>4</td>
+            <td>540.00</td>
+            <td class="exito-medio">50.00%</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td><span class="badge Experto">Experto</span></td>
+            <td>4</td>
+            <td>526.25</td>
+            <td class="exito-bajo">0.00%</td>
+        </tr>
+    </table>
+    <footer>Reporte generado automáticamente por LFP Numerix.</footer>
+</body>
+</html>

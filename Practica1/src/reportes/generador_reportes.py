@@ -68,7 +68,7 @@ class GeneradorReportes:
             <th>Dificultad</th>
             <th>Cantidad de Intentos</th>
             <th>Tiempo Promedio (s)</th>
-            <th>Tasa de Éxito</th>
+            <th>Tasa de Fallo</th>
         </tr>
 """)
         for fila in resumen:

@@ -166,7 +166,7 @@ class GestorTorneo:
             if cantidad > 0:
                 tiempo_promedio = sum(i.tiempo_segundos for i in intentos_tablero) / cantidad
                 exitosos = sum(1 for i in intentos_tablero if i.resuelto_correctamente)
-                tasa_exito = (exitosos / cantidad) * 100
+                tasa_exito = 100 - ((exitosos / cantidad) * 100)
             else:
                 tiempo_promedio = 0.0
                 tasa_exito = 0.0
