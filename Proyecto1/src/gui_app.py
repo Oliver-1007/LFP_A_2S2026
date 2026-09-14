@@ -10,8 +10,8 @@ from tkinter import filedialog, messagebox, ttk
 from .analizador_lexico import AnalizadorLexico
 from .detector_choques import detectar_choques
 from .generador_dot import guardar_dot
-from .generador_reportes import GeneradorReportes
-from .interprete import InterpreteHorario
+# from .generador_reportes import GeneradorReportes
+# from .interprete import InterpreteHorario
 from .tokens import TipoToken
 
 class AplicacionHorarioScript(tk.Tk):
