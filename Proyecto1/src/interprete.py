@@ -58,18 +58,23 @@ class InterpreteHorario:
         return int(valor) if valor.isdigit() else 0
 
     def _leer_atributos(self) -> dict:
-        #Lee pares clave: valor separados por comas hasta encontrar ']'
+        """Lee pares clave: valor separados por comas hasta encontrar ']'."""
         atributos: dict = {}
         while self._actual() is not None and not self._es_simbolo("]"):
+            if self._es_simbolo(",") or self._es_simbolo("}") or self._es_simbolo(";"):
+                break
             clave_tok = self._avanzar()
             if clave_tok is None:
                 break
-            self._consumir_simbolo(":")
-            valor_tok = self._avanzar()
-            if valor_tok is None:
+            if not self._consumir_simbolo(":"):
                 break
-            # CADENA y CODIGO llegan entre comillas 
-            # se despojan aqui para trabajar con el
+            valor_tok = self._avanzar()
+            if valor_tok is None or valor_tok.tipo == TipoToken.SIMBOLO:
+                if valor_tok is not None:
+                    self.pos -= 1
+                break
+            # CADENA y CODIGO llegan entre comillas (ver diseno del AFD en
+            # analizador_lexico.py); se despojan aqui para trabajar con el
             # valor semantico limpio en el resto del sistema.
             valor = self._quitar_comillas(valor_tok.lexema)
             atributos[clave_tok.lexema] = valor
@@ -109,13 +114,16 @@ class InterpreteHorario:
         self._consumir_simbolo(";")
 
     def _interpretar_curso(self) -> None:
+        linea = self._actual().linea if self._actual() else 0
         if not self._consumir_lexema("curso"):
             self._avanzar()
             return
         self._consumir_simbolo(":")
         nombre_tok = self._avanzar()
         nombre = self._quitar_comillas(nombre_tok.lexema) if nombre_tok else ""
-        self._consumir_simbolo("[")
+        if not self._consumir_simbolo("["):
+            self.modelo.cursos.append(Curso(codigo="", nombre=nombre, linea=linea))
+            return
         atributos = self._leer_atributos()
         self._consumir_simbolo("]")
         self._consumir_simbolo(",")
@@ -123,16 +131,19 @@ class InterpreteHorario:
             codigo=atributos.get("codigo", ""),
             nombre=nombre,
             creditos=self._a_entero(atributos.get("creditos", "")),
+            linea=linea,
         ))
 
     def _interpretar_catedratico(self) -> None:
+        linea = self._actual().linea if self._actual() else 0
         if not self._consumir_lexema("catedratico"):
             self._avanzar()
             return
         self._consumir_simbolo(":")
         nombre_tok = self._avanzar()
         nombre = self._quitar_comillas(nombre_tok.lexema) if nombre_tok else ""
-        self._consumir_simbolo("[")
+        if not self._consumir_simbolo("["):
+            return
         atributos = self._leer_atributos()
         self._consumir_simbolo("]")
         self._consumir_simbolo(",")
@@ -140,16 +151,19 @@ class InterpreteHorario:
             codigo=atributos.get("codigo", ""),
             nombre=nombre,
             categoria=atributos.get("categoria", ""),
+            linea=linea,
         ))
 
     def _interpretar_aula(self) -> None:
+        linea = self._actual().linea if self._actual() else 0
         if not self._consumir_lexema("aula"):
             self._avanzar()
             return
         self._consumir_simbolo(":")
         codigo_tok = self._avanzar()
         codigo = self._quitar_comillas(codigo_tok.lexema) if codigo_tok else ""
-        self._consumir_simbolo("[")
+        if not self._consumir_simbolo("["):
+            return
         atributos = self._leer_atributos()
         self._consumir_simbolo("]")
         self._consumir_simbolo(",")
@@ -157,9 +171,11 @@ class InterpreteHorario:
             codigo=codigo,
             capacidad=self._a_entero(atributos.get("capacidad", "")),
             edificio=atributos.get("edificio", ""),
+            linea=linea,
         ))
 
     def _interpretar_clase(self) -> None:
+        linea = self._actual().linea if self._actual() else 0
         if not self._consumir_lexema("clase"):
             self._avanzar()
             return
@@ -172,7 +188,8 @@ class InterpreteHorario:
         self._consumir_lexema("en")
         aula_tok = self._avanzar()
         aula_codigo = self._quitar_comillas(aula_tok.lexema) if aula_tok else ""
-        self._consumir_simbolo("[")
+        if not self._consumir_simbolo("["):
+            return
         atributos = self._leer_atributos()
         self._consumir_simbolo("]")
         self._consumir_simbolo(",")
@@ -184,4 +201,5 @@ class InterpreteHorario:
             inicio=atributos.get("inicio", ""),
             fin=atributos.get("fin", ""),
             seccion=atributos.get("seccion", ""),
+            linea=linea,
         ))

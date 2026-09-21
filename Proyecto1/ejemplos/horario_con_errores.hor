@@ -1,0 +1,20 @@
+## Archivo de prueba con errores lexicos intencionales de cada tipo.
+HORARIO {
+CURSOS {
+curso: "Lenguajes Formales y de Programacion" [codigo: "LFP-0796", creditos: 4],
+curso: "Redes @1" [codigo: "RED-01", creditos: 3] &,
+curso: "Curso sin cerrar comillas [codigo: "SIN-001", creditos: 3],
+};
+CATEDRATICOS {
+catedratico: "Otto Rodriguez" [codigo: "DOC-001", categoria: TITULAR],
+catedratico: "Persona Rara" [codigo: "DOC-XYZ", categoria: VOLADOR],
+};
+AULAS {
+aula: "A-101" [capacidad: 40, edificio: "T-3"],
+aula: "LAB~3" [capacidad: 25, edificio: "T-5"],
+};
+CLASES {
+clase: "LFP-0796" con "DOC-001" en "A-101" [dia: LUNES, inicio: 07:00, fin: 08:40, seccion: "N"],
+clase: "RED-01" con "DOC-001" en "A-101" [dia: DOMINGO, inicio: 23:30, fin: 23:59, seccion: "N"],
+};
+};

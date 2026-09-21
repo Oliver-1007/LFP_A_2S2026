@@ -48,6 +48,7 @@ class TipoError(Enum):
 
 @dataclass
 class Token:
+    """Representa un token reconocido por el analizador lexico."""
 
     tipo: TipoToken
     lexema: str
@@ -63,6 +64,7 @@ class Token:
 
 @dataclass
 class ErrorLexico:
+    """Representa un error lexico detectado durante el analisis."""
 
     numero: int
     lexema: str
@@ -72,5 +74,6 @@ class ErrorLexico:
     columna: int
 
     def como_fila(self) -> tuple:
-
+        """Devuelve la tupla (numero, lexema, tipo, descripcion, linea, columna)
+        lista para poblar la tabla de errores de la interfaz grafica."""
         return (self.numero, self.lexema, self.tipo.name, self.descripcion, self.linea, self.columna)

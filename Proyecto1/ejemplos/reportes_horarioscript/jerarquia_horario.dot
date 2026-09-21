@@ -1,0 +1,26 @@
+digraph HorarioScript {
+    rankdir=LR;
+    node [shape=box, style="rounded,filled", fontname="Helvetica"];
+    "HORARIO" [shape=doublecircle, fillcolor="#2c3e50", fontcolor=white];
+    "CURSOS" [fillcolor="#34495e", fontcolor=white];
+    "HORARIO" -> "CURSOS";
+    "CATEDRATICOS" [fillcolor="#34495e", fontcolor=white];
+    "HORARIO" -> "CATEDRATICOS";
+    "AULAS" [fillcolor="#34495e", fontcolor=white];
+    "HORARIO" -> "AULAS";
+    "CLASES" [fillcolor="#34495e", fontcolor=white];
+    "HORARIO" -> "CLASES";
+    "curso:LFP-0796" [label="LFP-0796\nLenguajes Formales y de Programacion", fillcolor="#aed6f1"];
+    "CURSOS" -> "curso:LFP-0796";
+    "catedratico:DOC-001" [label="DOC-001\nOtto Rodriguez\n(TITULAR)", fillcolor="#a9dfbf"];
+    "CATEDRATICOS" -> "catedratico:DOC-001";
+    "aula:A-101" [label="A-101\ncap. 40\nT-3", fillcolor="#f9e79f"];
+    "AULAS" -> "aula:A-101";
+    "aula:LAB~3" [label="LAB~3\ncap. 25\nT-5", fillcolor="#f9e79f"];
+    "AULAS" -> "aula:LAB~3";
+    "clase:1" [label="N\nLUNES 07:00-08:40", shape=ellipse, fillcolor="#f5b7b1"];
+    "CLASES" -> "clase:1";
+    "clase:1" -> "curso:LFP-0796" [label="dicta", style=dashed];
+    "clase:1" -> "catedratico:DOC-001" [label="con", style=dashed];
+    "clase:1" -> "aula:A-101" [label="en", style=dashed];
+}

@@ -6,7 +6,6 @@ from typing import List
 
 from .tokens import ErrorLexico, TipoError
 
-
 class GestorErrores:
     def __init__(self) -> None:
         self._errores: List[ErrorLexico] = []
@@ -49,4 +48,3 @@ class GestorErrores:
         """Limpia el estado del gestor para volver a analizar otro archivo."""
         self._errores.clear()
         self._contador = 0
-

@@ -10,16 +10,35 @@ from tkinter import filedialog, messagebox, ttk
 from .analizador_lexico import AnalizadorLexico
 from .detector_choques import detectar_choques
 from .generador_dot import guardar_dot
-# from .generador_reportes import GeneradorReportes
+from .generador_reportes import GeneradorReportes
 from .interprete import InterpreteHorario
 from .tokens import TipoToken
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class AplicacionHorarioScript(tk.Tk):
+
 
     def __init__(self) -> None:
         super().__init__()
         self.title("HorarioScript - Analizador Lexico de Horarios Academicos")
-        self.geometry("1150x720")
+        self.geometry("1250x720")
         self.minsize(950, 600)
 
         self.ruta_archivo_actual: str | None = None
@@ -32,7 +51,7 @@ class AplicacionHorarioScript(tk.Tk):
         self._construir_menu()
         self._construir_layout()
 
-
+    ## Construccion de la interfaz completa
     def _construir_menu(self) -> None:
         barra_menu = tk.Menu(self)
 
@@ -65,7 +84,7 @@ class AplicacionHorarioScript(tk.Tk):
         panel_principal = ttk.PanedWindow(self, orient="horizontal")
         panel_principal.pack(fill="both", expand=True, padx=8, pady=4)
 
-        # -- Panel izquierdo: contenido del archivo .hor --------------------
+        # Panel izquierdo: contenido del archivo .hor 
         marco_texto = ttk.Frame(panel_principal)
         ttk.Label(marco_texto, text="Contenido del archivo .hor").grid(
             row=0, column=0, columnspan=2, sticky="w"
@@ -81,7 +100,7 @@ class AplicacionHorarioScript(tk.Tk):
         marco_texto.columnconfigure(0, weight=1)
         panel_principal.add(marco_texto, weight=1)
 
-        # -- Panel derecho: pestanas con resultados --------------------------
+        # Panel derecho: pestanas con resultados 
         self.notebook = ttk.Notebook(panel_principal)
         panel_principal.add(self.notebook, weight=2)
 
@@ -150,7 +169,7 @@ class AplicacionHorarioScript(tk.Tk):
         self.texto_resumen.pack(fill="both", expand=True)
         self.notebook.add(marco, text="Resumen")
 
-
+    # acciones
 
     def cargar_archivo(self) -> None:
         ruta = filedialog.askopenfilename(
@@ -184,7 +203,9 @@ class AplicacionHorarioScript(tk.Tk):
         self.errores = analizador.gestor_errores.errores
 
         interprete = InterpreteHorario(self.tokens)
-        self.modelo = interprete.interpretar()
+        self.modelo = GeneradorReportes.modelo_valido(
+            interprete.interpretar(), self.errores
+        )
         self.choques = detectar_choques(self.modelo.clases)
         self.tiempo_analisis_ms = (time.perf_counter() - inicio) * 1000
 
@@ -262,7 +283,7 @@ class AplicacionHorarioScript(tk.Tk):
             messagebox.showwarning("Analisis requerido", "Ejecuta el analisis antes de generar los reportes.")
             return
         carpeta = self._carpeta_salida()
-        generador = GeneradorReportes(self.modelo, self.choques)
+        generador = GeneradorReportes(self.modelo, self.choques, self.errores)
         rutas = generador.generar_todos(carpeta, self.errores)
         mensaje = "\n".join(rutas.values())
         respuesta = messagebox.askyesno(

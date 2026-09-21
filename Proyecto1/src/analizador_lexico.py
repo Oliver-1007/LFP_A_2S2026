@@ -50,6 +50,7 @@ class AnalizadorLexico:
             return self.texto[idx]
         return None
 
+    ## Consume el caracter actual, actualiza linea/columna y lo retorna
     def _avanzar(self) -> str:
         c = self.texto[self.pos]
         self.pos += 1
@@ -68,7 +69,7 @@ class AnalizadorLexico:
                           linea: int, columna: int) -> None:
         self.gestor_errores.agregar(lexema, tipo, descripcion, linea, columna)
 
-    # -- API publica ---------------------------------------------------------
+    # Logica 
 
     def siguiente_token(self) -> Optional[Token]:
         while True:
@@ -163,50 +164,80 @@ class AnalizadorLexico:
     def _forma_de_codigo(self, interior: str) -> bool:
         posicion_guion = -1
         cantidad_guiones = 0
+        
+        # Buscar la posición y cantidad exacta de guiones
         for indice in range(len(interior)):
             if interior[indice] == "-":
                 cantidad_guiones += 1
                 if posicion_guion == -1:
                     posicion_guion = indice
+                    
+        # Un código debe tener obligatoriamente un solo guion
         if cantidad_guiones != 1:
             return False
 
         prefijo = interior[:posicion_guion]
         sufijo = interior[posicion_guion + 1:]
-        if len(prefijo) == 0 or len(sufijo) == 0:
+        
+        if not (1 <= len(prefijo) <= 3):
             return False
+            
+        # Debe iniciar obligatoriamente con una letra
         if not prefijo[0].isalpha():
             return False
+         
+        #El resto puede ser alfanumérico
         for caracter in prefijo:
             if not caracter.isalnum():
                 return False
+                
+        # El sufijo debe contener al menos un dígito
+        if len(sufijo) == 0:
+            return False
+            
+        # El sufijo debe ser exclusivamente numérico
         for caracter in sufijo:
             if not caracter.isdigit():
                 return False
+                
         return True
 
-    def _clasificar_literal_entre_comillas(self, lexema: str, linea_i: int,
-                                            columna_i: int) -> Optional[Token]:
+    def _clasificar_literal_entre_comillas(self, lexema: str, linea_i: int, columna_i: int) -> Optional[Token]:
         interior = lexema[1:-1] if len(lexema) >= 2 else ""
 
+        # Verificación directa de formato válido
+        if self._forma_de_codigo(interior):
+            return Token(TipoToken.CODIGO, lexema, linea_i, columna_i)
+
+        # Buscar si el interior tiene un guion
         contiene_guion = False
         for caracter in interior:
             if caracter == "-":
                 contiene_guion = True
                 break
-
+                
+        # Si no tiene guion, es simplemente un texto libre 
         if not contiene_guion:
             return Token(TipoToken.CADENA, lexema, linea_i, columna_i)
 
-        if self._forma_de_codigo(interior):
-            return Token(TipoToken.CODIGO, lexema, linea_i, columna_i)
+        # Si tiene guion pero no cumplió _forma_de_codigo, aplicamos una regla
+        # básica: si contiene espacios asume que es una CADENA normal (ej. "Curso - 1").
+        tiene_espacios = False
+        for caracter in interior:
+            if caracter == " ":
+                tiene_espacios = True
+                break
 
-        self._registrar_error(
-            lexema, TipoError.CODIGO_MAL_FORMADO,
-            f"Codigo mal formado: '{lexema}' en linea {linea_i}, columna {columna_i}",
-            linea_i, columna_i,
-        )
-        return None
+        if not tiene_espacios:
+            self._registrar_error(
+                lexema, TipoError.CODIGO_MAL_FORMADO,
+                f"Codigo mal formado: '{lexema}' en linea {linea_i}, columna {columna_i}",
+                linea_i, columna_i,
+            )
+            return None
+            
+        # Si tiene guion pero también espacios, es una CADENA regular válida
+        return Token(TipoToken.CADENA, lexema, linea_i, columna_i)
 
     def _leer_digitos(self) -> str:
         digitos = []
@@ -257,7 +288,10 @@ class AnalizadorLexico:
             return None
         return Token(TipoToken.HORA, lexema, linea_i, columna_i)
 
+    ##Subautomata alfabetico: consume letras y decide entre CODIGO,
+    ##palabra reservada, DIA o CATEGORIA
     def _leer_palabra(self, linea_i: int, columna_i: int) -> Optional[Token]:
+        
         letras = []
         while self._actual() is not None and self._actual().isalpha():
             letras.append(self._avanzar())
@@ -299,6 +333,7 @@ class AnalizadorLexico:
         return Token(TipoToken.CODIGO, lexema, linea_i, columna_i)
 
     def _leer_continuacion_codigo(self) -> str:
+        """Consume letras, digitos o guiones pegados al candidato actual."""
         caracteres = []
         while self._actual() is not None:
             caracter = self._actual()
@@ -341,6 +376,9 @@ class AnalizadorLexico:
                     linea_i, columna_i,
                 )
             elif palabra.isupper():
+                # Fuera de contexto explicito, una palabra completamente en
+                # mayusculas que no coincide con ninguna palabra de bloque ni
+                # enumeracion es, con alta probabilidad, un dia mal escrito.
                 self._registrar_error(
                     palabra, TipoError.DIA_NO_RECONOCIDO,
                     f"Dia no reconocido: '{palabra}' en linea {linea_i}, columna {columna_i}",
@@ -352,8 +390,5 @@ class AnalizadorLexico:
                     f"Palabra no reconocida: '{palabra}' en linea {linea_i}, columna {columna_i}",
                     linea_i, columna_i,
                 )
-
-        # El contexto de "dia"/"categoria" solo cubre la palabra inmediata
-        # siguiente (el valor del atributo); se limpia u ocupa aqui.
         self.contexto_esperado = nuevo_contexto
         return resultado

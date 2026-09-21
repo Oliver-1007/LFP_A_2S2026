@@ -8,7 +8,10 @@ from dataclasses import dataclass
 from itertools import combinations
 from typing import List, Optional
 
-from .modelos import Clase
+from .modelos import Clase, separar_hora
+
+
+
 
 
 #Representa un choque de horario detectado entre dos clases
@@ -22,8 +25,8 @@ class Choque:
 
 
 def _a_minutos(hora: str) -> Optional[int]:
-    partes = hora.split(":")
-    if len(partes) != 2:
+    partes = separar_hora(hora)
+    if partes is None:
         return None
     h, m = partes
     if not (h.isdigit() and m.isdigit()):
@@ -41,8 +44,8 @@ def _se_traslapan(clase_a: Clase, clase_b: Clase) -> bool:
     return ini_a < fin_b and ini_b < fin_a
 
 
-#Recorre todos los pares de clases y reporta los choques encontrados
 def detectar_choques(clases: List[Clase]) -> List[Choque]:
+    """Recorre todos los pares de clases y reporta los choques encontrados."""
     choques: List[Choque] = []
     for clase_a, clase_b in combinations(clases, 2):
         if not _se_traslapan(clase_a, clase_b):
