@@ -9,7 +9,7 @@ from .detector_choques import Choque
 from .modelos import ModeloHorario, separar_hora
 from .tokens import ErrorLexico
 
-DIAS_SEMANA = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"]
+DIAS_SEMANA = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"]
 CATEGORIAS_VALIDAS = {"TITULAR", "INTERINO", "AUXILIAR"}
 
 CSS_BASE = """

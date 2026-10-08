@@ -15,23 +15,6 @@ from .interprete import InterpreteHorario
 from .tokens import TipoToken
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class AplicacionHorarioScript(tk.Tk):
 
 

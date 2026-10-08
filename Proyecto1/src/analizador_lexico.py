@@ -17,7 +17,7 @@ PALABRAS_ATRIBUTO = {
     "codigo", "creditos", "categoria", "capacidad", "edificio",
     "dia", "inicio", "fin", "seccion",
 }
-DIAS_VALIDOS = {"LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"}
+DIAS_VALIDOS = {"LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"}
 CATEGORIAS_VALIDAS = {"TITULAR", "INTERINO", "AUXILIAR"}
 
 SIMBOLOS_VALIDOS = set("{}[]:,;")
@@ -37,7 +37,7 @@ class AnalizadorLexico:
         self.gestor_errores = GestorErrores()
         self.contexto_esperado: Optional[str] = None
 
-    # -- Utilidades de bajo nivel sobre el buffer de entrada ---------------
+    # Utilidades de bajo nivel sobre el buffer de entrada
 
     def _actual(self) -> Optional[str]:
         if self.pos < self.longitud:

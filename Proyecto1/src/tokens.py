@@ -9,29 +9,28 @@ from enum import Enum, auto
 
 class TipoToken(Enum):
 
-    # Palabras reservadas que delimitan las 5 secciones principales
     PALABRA_RESERVADA_BLOQUE = auto()
-    # Palabras reservadas que introducen un elemento dentro de una seccion
+
     PALABRA_RESERVADA_ELEMENTO = auto()
-    # Palabras reservadas de relacion (con, en)
+
     PALABRA_RESERVADA_RELACION = auto()
-    # Palabras reservadas que nombran un atributo (codigo, dia, etc)
+
     PALABRA_RESERVADA_ATRIBUTO = auto()
-    # Codigos alfanumericos con guion (LFP-0796, DOC-001, A-101)
+
     CODIGO = auto()
-    # Literales de texto entre comillas dobles
+
     CADENA = auto()
-    # Literales de hora en formato HH:MM
+
     HORA = auto()
-    # Literales numericos enteros
+
     ENTERO = auto()
-    # Enumeracion de dias (LUNES..SABADO)
+
     DIA = auto()
-    # Enumeracion de categoria de catedratico
+
     CATEGORIA = auto()
-    # Caracteres de puntuacion con significado sintactico
+
     SIMBOLO = auto()
-    # Comentario de linea que inicia con ##
+
     COMENTARIO_LINEA = auto()
 
 
