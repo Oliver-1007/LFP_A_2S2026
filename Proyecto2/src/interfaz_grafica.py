@@ -7,12 +7,14 @@ import webbrowser
 from tkinter import filedialog, messagebox, ttk
 
 from procesador import ProcesadorMarkdown
+from vista_previa import VistaPrevia
 
 
-## Ventana principal de la aplicación
 class AplicacionMarkdownCheck:
+    """Ventana principal de la aplicación."""
 
     TITULO = "MarkdownCheck — Analizador Léxico-Sintáctico de Markdown a HTML"
+    RETARDO_VISTA_MS = 300
 
     def __init__(self, raiz, archivo_inicial=None):
         self.raiz = raiz
@@ -20,9 +22,11 @@ class AplicacionMarkdownCheck:
         self.resultado = None
         self.ruta_archivo = None
         self.rutas_reportes = {}
+        self._temporizador_vista = None
+        self.vista_en_vivo = tk.BooleanVar(value=True)
 
         raiz.title(self.TITULO)
-        raiz.geometry("1320x760")
+        raiz.geometry("1500x760")
         raiz.minsize(980, 560)
 
         self._crear_estilos()
@@ -35,8 +39,7 @@ class AplicacionMarkdownCheck:
             self._cargar_archivo(archivo_inicial)
 
 
-    ## Construcción de la interfaz
-
+    # Construcción de la interfaz
     def _crear_estilos(self):
         estilo = ttk.Style()
         try:
@@ -51,10 +54,10 @@ class AplicacionMarkdownCheck:
         barra = ttk.Frame(self.raiz, padding=(8, 6))
         barra.pack(side=tk.TOP, fill=tk.X)
 
-        ttk.Button(barra, text="📂 Abrir .md", command=self.abrir_archivo).pack(side=tk.LEFT, padx=2)
-        ttk.Button(barra, text="💾 Guardar", command=self.guardar_archivo).pack(side=tk.LEFT, padx=2)
+        ttk.Button(barra, text="Abrir .md", command=self.abrir_archivo).pack(side=tk.LEFT, padx=2)
+        ttk.Button(barra, text="Guardar", command=self.guardar_archivo).pack(side=tk.LEFT, padx=2)
         ttk.Separator(barra, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=8)
-        self.btn_analizar = ttk.Button(barra, text="▶ Analizar", style="Principal.TButton",
+        self.btn_analizar = ttk.Button(barra, text="Analizar", style="Principal.TButton",
                                        command=self.analizar)
         self.btn_analizar.pack(side=tk.LEFT, padx=2)
         ttk.Separator(barra, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=8)
@@ -68,18 +71,19 @@ class AplicacionMarkdownCheck:
         for boton in (self.btn_r1, self.btn_r2, self.btn_r3):
             boton.pack(side=tk.LEFT, padx=2)
         ttk.Separator(barra, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=8)
-
-        self.btn_dot = ttk.Button(barra, text="🌳 Exportar árbol (.dot)", command=self.exportar_dot)
+        ttk.Checkbutton(barra, text="Vista previa en vivo", variable=self.vista_en_vivo,
+                        command=self._alternar_vista_en_vivo).pack(side=tk.LEFT, padx=2)
+        self.btn_dot = ttk.Button(barra, text="Exportar árbol (.dot)", command=self.exportar_dot)
         self.btn_dot.pack(side=tk.LEFT, padx=2)
-        self.btn_tablas = ttk.Button(barra, text="📋 Exportar tablas (HTML)", command=self.exportar_tablas)
+        self.btn_tablas = ttk.Button(barra, text="Exportar tablas (HTML)", command=self.exportar_tablas)
         self.btn_tablas.pack(side=tk.LEFT, padx=2)
-        ttk.Button(barra, text="🧹 Limpiar", command=self.limpiar).pack(side=tk.RIGHT, padx=2)
+        ttk.Button(barra, text="Limpiar", command=self.limpiar).pack(side=tk.RIGHT, padx=2)
 
     def _crear_paneles(self):
         divisor = ttk.PanedWindow(self.raiz, orient=tk.HORIZONTAL)
         divisor.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 4))
 
-        ## Panel izquierdo: editor
+        # Panel izquierdo: editor
         marco_editor = ttk.LabelFrame(divisor, text=" Editor Markdown ", padding=4)
         divisor.add(marco_editor, weight=1)
 
@@ -93,8 +97,9 @@ class AplicacionMarkdownCheck:
         self.editor.pack(fill=tk.BOTH, expand=True)
         self.editor.tag_configure("resaltado", background="#fff3a3")
         self.editor.tag_configure("error", background="#ffb3b3")
+        self.editor.bind("<<Modified>>", self._al_modificar_editor)
 
-        ## Panel derecho: pestañas
+        # Panel derecho: pestañas
         self.pestanas = ttk.Notebook(divisor)
         divisor.add(self.pestanas, weight=2)
 
@@ -112,6 +117,15 @@ class AplicacionMarkdownCheck:
         self.tabla_errores.bind("<<TreeviewSelect>>", self._seleccionar_error)
         self.tabla_errores.tag_configure("lexico", background="#ffe9e9")
         self.tabla_errores.tag_configure("sintactico", background="#fff1d6")
+
+        self.marco_vista = ttk.Frame(self.pestanas)
+        self.pestanas.add(self.marco_vista, text="Vista previa")
+        self.texto_vista = tk.Text(self.marco_vista, borderwidth=0, highlightthickness=0)
+        vista_v = ttk.Scrollbar(self.marco_vista, orient=tk.VERTICAL, command=self.texto_vista.yview)
+        self.texto_vista.configure(yscrollcommand=vista_v.set)
+        vista_v.pack(side=tk.RIGHT, fill=tk.Y)
+        self.texto_vista.pack(fill=tk.BOTH, expand=True)
+        self.vista = VistaPrevia(self.texto_vista)
 
         marco_dot = ttk.Frame(self.pestanas)
         self.pestanas.add(marco_dot, text="Árbol de derivación (DOT)")
@@ -155,7 +169,7 @@ class AplicacionMarkdownCheck:
         self.btn_tablas.configure(state=tk.NORMAL if hay_resultado else tk.DISABLED)
 
 
-    ## Archivos
+    # Archivos
     def abrir_archivo(self):
         ruta = filedialog.askopenfilename(
             title="Abrir documento Markdown",
@@ -199,7 +213,7 @@ class AplicacionMarkdownCheck:
         return os.path.join(base, "reportes")
 
 
-    ## Análisis
+    # Análisis
     def analizar(self):
         texto = self.editor.get("1.0", "end-1c")
         nombre = os.path.basename(self.ruta_archivo) if self.ruta_archivo else "documento.md"
@@ -209,6 +223,7 @@ class AplicacionMarkdownCheck:
         self._mostrar_tokens()
         self._mostrar_errores()
         self._mostrar_dot()
+        self.vista.renderizar(self.resultado.arbol, not self.resultado.exito)
 
         total_tokens = len(self.resultado.tokens_visibles)
         total_errores = self.resultado.gestor.cantidad()
@@ -260,9 +275,43 @@ class AplicacionMarkdownCheck:
         self.ruta_archivo = None
         self.raiz.title(self.TITULO)
         self._limpiar_resultados()
+        self.vista.limpiar()
         self.estado.set("Listo.")
 
-    ## tablas
+    # vista previa en vivo
+    def _al_modificar_editor(self, _evento=None):
+        if not self.editor.edit_modified():
+            return
+        self.editor.edit_modified(False)
+        if not self.vista_en_vivo.get():
+            return
+        if self._temporizador_vista is not None:
+            self.raiz.after_cancel(self._temporizador_vista)
+        self._temporizador_vista = self.raiz.after(self.RETARDO_VISTA_MS,
+                                                   self._actualizar_vista_previa)
+
+    ## Analiza el texto actual y redibuja la vista previa
+    def _actualizar_vista_previa(self):
+        self._temporizador_vista = None
+        texto = self.editor.get("1.0", "end-1c")
+        try:
+            resultado = self.procesador.analizar(texto)
+            self.vista.renderizar(resultado.arbol, not resultado.exito)
+        except Exception as error:
+            self.estado.set("No se pudo actualizar la vista previa: %s" % error)
+
+    def _alternar_vista_en_vivo(self):
+        if self.vista_en_vivo.get():
+            self._actualizar_vista_previa()
+            self.pestanas.select(self.marco_vista)
+            self.estado.set("Vista previa en vivo activada.")
+        else:
+            if self._temporizador_vista is not None:
+                self.raiz.after_cancel(self._temporizador_vista)
+                self._temporizador_vista = None
+            self.estado.set("Vista previa en vivo desactivada: se actualiza solo al pulsar «Analizar».")
+
+    # tablas
     def _mostrar_tokens(self):
         for numero, token in enumerate(self.resultado.tokens_visibles, 1):
             self.tabla_tokens.insert(
@@ -283,7 +332,7 @@ class AplicacionMarkdownCheck:
         self.texto_dot.insert("1.0", codigo)
         self.texto_dot.configure(state=tk.DISABLED)
 
-    ## resaltado en editor
+    # resaltado en editor
     def _seleccionar_token(self, _evento):
         seleccion = self.tabla_tokens.selection()
         if not seleccion or self.resultado is None:
@@ -308,7 +357,7 @@ class AplicacionMarkdownCheck:
         self.editor.see(inicio)
 
 
-    ## Reportes y exportaciones
+    # Reportes y exportaciones
     def abrir_reporte(self, clave):
         ruta = self.rutas_reportes.get(clave)
         if not ruta or not os.path.exists(ruta):
@@ -332,7 +381,7 @@ class AplicacionMarkdownCheck:
         mensaje = "Árbol guardado en:\n%s" % ruta
         dot = shutil.which("dot")
         if dot:                                    # render opcional si Graphviz está instalado
-            png = os.path.ext(ruta)[0] + ".png"
+            png = os.path.splitext(ruta)[0] + ".png"
             try:
                 subprocess.run([dot, "-Tpng", ruta, "-o", png], check=True, timeout=60)
                 mensaje += "\n\nImagen generada:\n%s" % png
