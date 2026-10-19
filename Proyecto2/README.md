@@ -86,7 +86,7 @@ MarkdownCheck/
 │   ├── procesador.py          Fachada: análisis + escritura de archivos
 │   └── interfaz_grafica.py    AplicacionMarkdownCheck (Tkinter)
 ├── tests/                     Pruebas automatizadas (unittest, 156 pruebas)
-├── examples/                  Documentos de entrada de ejemplo
+├── ejemplos/                  Documentos de entrada de ejemplo
 │   ├── ejemplo_valido.md
 │   └── ejemplo_con_errores.md
 ├── docs/                      Documentación
